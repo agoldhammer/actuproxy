@@ -1,10 +1,12 @@
 import { subHours, format } from "date-fns";
 import { MongoClient } from "mongodb";
+import { toUSVString } from "sys";
 
 async function getData(start: Date, end: Date): Promise<any> {
   console.log("conn: starting mongo client");
-  const client = new MongoClient("mongodb://192.168.0.128:27017/actur");
-  const db = client.db();
+  const uri = "mongodb://192.168.0.128:27017";
+  const client = new MongoClient(uri);
+  const db = client.db("actur");
   const articles = db.collection("articles");
   const ndocs = await articles.countDocuments();
   console.log("getData: ndocs", ndocs);
@@ -29,11 +31,13 @@ async function getData(start: Date, end: Date): Promise<any> {
       )
       .sort({ pubdate: -1 })
       .toArray();
+  } catch (error) {
+    console.log("Mongodb error:", error);
   } finally {
     console.log("closing connection");
-    client.close();
+    await client.close();
   }
-
+  console.log("debug getData", data.length);
   return { totcount: ndocs, articles: data };
 }
 
@@ -53,13 +57,15 @@ const server = Bun.serve({
     // // db setup
     const timewindow = 2;
     const tf = parseInt(timeframe, 10);
-    // console.log("conn: timeframe:", timeframe);
     const now = new Date();
     const end: Date = subHours(now, tf * timewindow);
     const start: Date = subHours(end, timewindow);
     console.log("start/end", start, end);
+    // let _data: any = {};
     getData(start, end).then((res) => {
-      _data = res || {};
+      console.log("debug fetch data length", res.articles.length);
+      _data = res;
+      console.dir("fetch _data", _data.articles.length);
     });
 
     const reply = {
