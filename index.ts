@@ -1,15 +1,13 @@
 import { subHours, format } from "date-fns";
 import { MongoClient } from "mongodb";
 
-console.log("Serving on localhost:3433");
-
 async function getData(start: Date, end: Date): Promise<any> {
   console.log("conn: starting mongo client");
   const client = new MongoClient("mongodb://192.168.0.128:27017/actur");
   const db = client.db();
   const articles = db.collection("articles");
   const ndocs = await articles.countDocuments();
-  console.log("ndocs", ndocs);
+  console.log("getData: ndocs", ndocs);
   let data: any;
 
   try {
@@ -32,6 +30,7 @@ async function getData(start: Date, end: Date): Promise<any> {
       .sort({ pubdate: -1 })
       .toArray();
   } finally {
+    console.log("closing connection");
     client.close();
   }
 
@@ -40,11 +39,12 @@ async function getData(start: Date, end: Date): Promise<any> {
 
 let _data: any;
 
-Bun.serve({
+const server = Bun.serve({
   port: 3433, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
-  hostname: "localhost", // defaults to "0.0.0.0"
+  hostname: "0.0.0.0", // defaults to "0.0.0.0"
 
   fetch(req) {
+    console.log("request", req);
     const url = new URL(req.url);
     const sparams = url.searchParams;
     console.log("timeframe", sparams);
@@ -75,4 +75,14 @@ Bun.serve({
     // return Response.json({ text: "Bun proxy!", retdata: reply });
     return Response.json(reply);
   },
+
+  error(error) {
+    return new Response(`<pre>${error}\n${error.stack}</pre>`, {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    });
+  },
 });
+
+console.log(`Serving on ${server.hostname}:${server.port}`);
