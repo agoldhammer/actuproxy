@@ -13,9 +13,11 @@ interface ActuData {
   timespan: Timespan;
 }
 
+const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
+
 async function getData(start: Date, end: Date): Promise<ActuData> {
   // console.log("conn: starting mongo client");
-  const uri = "mongodb://192.168.0.128:27017";
+  // console.log("URI", uri);
   const client = new MongoClient(uri);
   const db = client.db("actur");
   const articles = db.collection("articles");
@@ -53,8 +55,8 @@ async function getData(start: Date, end: Date): Promise<ActuData> {
     articles: data,
     count: data.length,
     timespan: {
-      start: format(start, "HH:mm 0"),
-      end: format(end, "HH:mm 0"),
+      start: format(start, "HH:mm O"),
+      end: format(end, "HH:mm O"),
     },
   };
 }
@@ -67,6 +69,7 @@ const server = Bun.serve({
     // console.log("request", req);
     const url = new URL(req.url);
     const sparams = url.searchParams;
+    console.log("headers", req.headers);
     // console.log("timeframe", sparams);
     let timeframe = sparams.get("timeframe") || "0";
 
