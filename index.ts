@@ -69,7 +69,7 @@ const server = Bun.serve({
     // console.log("request", req);
     const url = new URL(req.url);
     const sparams = url.searchParams;
-    console.log("headers", req.headers);
+    // console.log("headers", req.headers);
     // console.log("timeframe", sparams);
     let timeframe = sparams.get("timeframe") || "0";
 
@@ -79,7 +79,7 @@ const server = Bun.serve({
     const now = new Date();
     const end: Date = subHours(now, tf * timewindow);
     const start: Date = subHours(end, timewindow);
-    // console.log("start/end", start, end);
+    console.log("ActuProxy:", now);
     const reply = getData(start, end).then((res) => Response.json(res));
 
     return reply;
