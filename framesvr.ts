@@ -64,7 +64,7 @@ const server = Bun.serve({
   hostname: "0.0.0.0", // defaults to "0.0.0.0"
 
   fetch(req) {
-    console.log("request", req);
+    // console.log("request", req);
     const url = new URL(req.url);
     const sparams = url.searchParams;
     // console.log("timeframe", sparams);
@@ -79,7 +79,7 @@ const server = Bun.serve({
     const now = new Date();
     const end: Date = subHours(now, tf * tw);
     const start: Date = subHours(end, tw);
-    // console.log("start/end", start, end);
+    console.log("actuproxy: start/end:", start, end);
     const reply = getData(start, end).then((res) => Response.json(res));
 
     return reply;
