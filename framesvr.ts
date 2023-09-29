@@ -53,8 +53,8 @@ async function getData(start: Date, end: Date): Promise<ActuData> {
     articles: data,
     count: data.length,
     timespan: {
-      start: format(start, "HH:mm 0"),
-      end: format(end, "HH:mm 0"),
+      start: format(start, "HH:mm O"),
+      end: format(end, "HH:mm O"),
     },
   };
 }
