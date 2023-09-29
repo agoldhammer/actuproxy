@@ -64,7 +64,7 @@ const server = Bun.serve({
   hostname: "0.0.0.0", // defaults to "0.0.0.0"
 
   fetch(req) {
-    // console.log("request", req);
+    console.log("request", req);
     const url = new URL(req.url);
     const sparams = url.searchParams;
     // console.log("timeframe", sparams);
