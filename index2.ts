@@ -15,20 +15,34 @@ interface ActuData {
 
 const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
 
-async function getData(start: Date, end: Date, txtquery: string | undefined): Promise<ActuData> {
+async function getData(
+  start: Date,
+  end: Date,
+  txtquery: string | null
+): Promise<ActuData> {
   const uri = "mongodb://192.168.0.128:27017";
   const client = new MongoClient(uri);
-//   console.log("conn: starting mongo client", uri, client);
+  //   console.log("conn: starting mongo client", uri, client);
   const db = client.db("actur");
   const articles = db.collection("articles");
   const ndocs = await articles.countDocuments();
   let data: any;
   let query = {};
-  if (txtquery === undefined) {
-    query = { pubdate: { $gte: start, $lt: end } }
+  if (txtquery === null) {
+    console.log("txtquery null");
+
+    query = { pubdate: { $gte: start, $lt: end } };
   } else {
-    query = {pubdate: { $gte: start, $lt: end },
-             $text: {$search: txtquery, $caseSensitive: false, $diacriticSensitive: false}}
+    console.log("txtquery", txtquery);
+
+    query = {
+      pubdate: { $gte: start, $lt: end },
+      $text: {
+        $search: txtquery,
+        $caseSensitive: false,
+        $diacriticSensitive: false,
+      },
+    };
   }
 
   try {
@@ -70,7 +84,7 @@ async function getData(start: Date, end: Date, txtquery: string | undefined): Pr
 }
 
 const server = Bun.serve({
-  port: 33433, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
+  port: 23433, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
   hostname: "0.0.0.0", // defaults to "0.0.0.0"
 
   fetch(req) {
@@ -81,9 +95,8 @@ const server = Bun.serve({
     // console.log("timeframe", sparams);
     const timeframe = sparams.get("timeframe") || "0";
     const timewindow = sparams.get("timewindow") || "2";
-    const txtquery = sparams.get("txtquery") || "Gaza";
+    const txtquery = sparams.get("txtquery");
     console.log("tq", txtquery);
-    
 
     // // db setup
     // const timewindow = 2;
@@ -94,7 +107,9 @@ const server = Bun.serve({
     const end: Date = subHours(now, tf * tw);
     const start: Date = subHours(end, tw);
     // console.log("start/end", start, end);
-    const reply = getData(start, end, txtquery).then((res) => Response.json(res));
+    const reply = getData(start, end, txtquery).then((res) =>
+      Response.json(res)
+    );
 
     return reply;
   },
