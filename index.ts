@@ -28,8 +28,8 @@ async function getData(
   const ndocs = await articles.countDocuments();
   let data: any;
   let query = {};
-  if (txtquery === null) {
-    console.log("txtquery null");
+  if (txtquery === null || txtquery === undefined || txtquery.length === 0) {
+    console.log("omitting text search");
 
     query = { pubdate: { $gte: start, $lt: end } };
   } else {
