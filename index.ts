@@ -20,7 +20,7 @@ async function getData(
   end: Date,
   txtquery: string | null
 ): Promise<ActuData> {
-  const uri = "mongodb://192.168.0.128:27017";
+  // const uri = "mongodb://192.168.0.128:27017";
   const client = new MongoClient(uri);
   //   console.log("conn: starting mongo client", uri, client);
   const db = client.db("actur");
@@ -85,7 +85,7 @@ async function getData(
 
 const server = Bun.serve({
   port: 33433, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
-  hostname: "0.0.0.0", // defaults to "0.0.0.0"
+  hostname: "localhost",
 
   fetch(req) {
     // console.log("request", req);
