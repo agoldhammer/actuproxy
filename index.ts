@@ -13,7 +13,10 @@ interface ActuData {
   timespan: Timespan;
 }
 
-const uri = process.env.MONGO_URI || "mongodb://localhost:27017";
+const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
+
+const timestamp = () => `[${new Date().toUTCString()}]`;
+const tsLog = (...args: any[]) => console.log(timestamp(), ...args);
 
 async function getData(
   start: Date,
@@ -29,11 +32,11 @@ async function getData(
   let data: any;
   let query = {};
   if (txtquery === null || txtquery === undefined || txtquery.length === 0) {
-    console.log("omitting text search");
+    // tsLog("omitting text search");
 
     query = { pubdate: { $gte: start, $lt: end } };
   } else {
-    console.log("txtquery", txtquery);
+    tsLog("txtquery", txtquery);
 
     query = {
       pubdate: { $gte: start, $lt: end },
@@ -66,7 +69,7 @@ async function getData(
       .sort({ pubdate: -1 })
       .toArray();
   } catch (error) {
-    console.log("Mongodb error:", error);
+    tsLog("Mongodb error:", error);
   } finally {
     // console.log("closing connection");
     await client.close();
@@ -96,13 +99,13 @@ const server = Bun.serve({
     const timeframe = sparams.get("timeframe") || "0";
     const timewindow = sparams.get("timewindow") || "2";
     const txtquery = sparams.get("txtquery");
-    console.log("tq", txtquery);
+    tsLog("tq", txtquery);
 
     // // db setup
     // const timewindow = 2;
     const tf = parseInt(timeframe, 10);
     const tw = parseInt(timewindow, 10);
-    console.log("params", tf, tw);
+    tsLog("params", tf, tw);
     const now = new Date();
     const end: Date = subHours(now, tf * tw);
     const start: Date = subHours(end, tw);
@@ -123,4 +126,4 @@ const server = Bun.serve({
   },
 });
 
-console.log(`ActuProxy serving on ${server.hostname}:${server.port}`);
+tsLog(`ActuProxy serving on ${server.hostname}:${server.port}`);
