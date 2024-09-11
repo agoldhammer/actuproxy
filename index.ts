@@ -23,17 +23,13 @@ async function getData(
   end: Date,
   txtquery: string | null
 ): Promise<ActuData> {
-  // const uri = "mongodb://192.168.0.128:27017";
   const client = new MongoClient(uri);
-  //   console.log("conn: starting mongo client", uri, client);
   const db = client.db("actur");
   const articles = db.collection("articles");
   const ndocs = await articles.countDocuments();
   let data: any;
   let query = {};
   if (txtquery === null || txtquery === undefined || txtquery.length === 0) {
-    // tsLog("omitting text search");
-
     query = { pubdate: { $gte: start, $lt: end } };
   } else {
     tsLog("txtquery", txtquery);
@@ -89,6 +85,7 @@ async function getData(
 const server = Bun.serve({
   port: 33433, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
   hostname: "localhost",
+  // hostname: "0.0.0.0",
 
   fetch(req) {
     // console.log("request", req);
