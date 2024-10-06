@@ -26,7 +26,7 @@ async function getData(
   const client = new MongoClient(uri);
   const db = client.db("actur");
   const articles = db.collection("articles");
-  const ndocs = await articles.countDocuments();
+  const ndocs = await articles.estimatedDocumentCount();
   let data: any;
   let query = {};
   if (txtquery === null || txtquery === undefined || txtquery.length === 0) {
